@@ -1,7 +1,7 @@
 const graphql = require('graphql');
 const mongoose = require('mongoose');
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList, GraphQLNonNull } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList, GraphQLNonNull } = graphql;
 
 const Movies = require('../models/movie');
 const Directors = require('../models/director');
@@ -30,6 +30,8 @@ const MovieType = new GraphQLObjectType({
         id: { type: GraphQLString },
         name: { type: new GraphQLNonNull(GraphQLString) },
         genre: { type: new GraphQLNonNull(GraphQLString) },
+        watched: { type: new GraphQLNonNull(GraphQLBoolean)},
+        rate: { type: GraphQLInt },
         director: {
             type: DirectorType,
             resolve(parent, args) {
