@@ -6,24 +6,6 @@ const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQL
 const Movies = require('../models/movie');
 const Directors = require('../models/director');
 
-// const movies = [
-//     { id: '1', name: 'Pulp Fiction', genre: 'Crime', directorId: '1'},
-//     { id: '2', name: '1984', genre: 'Sci-Fi', directorId: '2'},
-//     { id: '3', name: 'V for vendetta', genre: 'Sci-Fi-Triller', directorId: '3'},
-//     { id: '4', name: 'Snatch', genre: 'Crime', directorId: '4'},
-//     { id: '5', name: 'Reservoir Dogs', genre: 'Crime', directorId: '1'},
-//     { id: '6', name: 'The Hateful Eight', genre: 'Crime', directorId: '1'},
-//     { id: '7', name: 'Inglourious Basterds', genre: 'Crime', directorId: '1'},
-//     { id: '8', name: 'Lock, Stock and Two Smoking Barrels', genre: 'Crime-Comedy', directorId: '4'},
-// ]
-
-// const directors = [
-//     { id: '1', name: 'Quentin Tarantino', age: 55 },
-//     { id: '2', name: 'Michael Radford', age: 72 },
-//     { id: '3', name: 'James McTeigue', age: 51 },
-//     { id: '4', name: 'Guy Ritchie', age: 50 }
-// ]
-
 const MovieType = new GraphQLObjectType({
     name: 'Movie',
     fields: () => ({
@@ -53,7 +35,7 @@ const DirectorType = new GraphQLObjectType({
             type: new GraphQLList(MovieType),
             resolve(parent, args) {
                 // return movies.filter(m => m.directorId == parent.id)
-                return Movies.find({ directorId: parent.id });
+                return Movies.find({ directorId: mongoose.Types.ObjectId(parent.id) });
             }
         }
     })
@@ -81,13 +63,17 @@ const Mutation = new GraphQLObjectType({
             args: {
                 name: { type: new GraphQLNonNull(GraphQLString) },
                 genre: { type: new GraphQLNonNull(GraphQLString) },
-                directorId: { type: GraphQLID }
+                directorId: { type: GraphQLID },
+                watched: { type: new GraphQLNonNull(GraphQLBoolean)},
+                rate: { type: GraphQLInt }
             },
             resolve(parent, args) {
                 const movie = new Movies({
                     name: args.name,
                     genre: args.genre,
-                    directorId: mongoose.Types.ObjectId(args.directorId)
+                    directorId: mongoose.Types.ObjectId(args.directorId),
+                    watched: args.watched,
+                    rate: args.rate
                 });
                 return movie.save();
             }
@@ -133,7 +119,9 @@ const Mutation = new GraphQLObjectType({
                 id: { type: GraphQLID },
                 name: { type: new GraphQLNonNull(GraphQLString) },
                 genre: { type: new GraphQLNonNull(GraphQLString) },
-                directorId: { type: GraphQLID }
+                directorId: { type: GraphQLID },
+                watched: { type: new GraphQLNonNull(GraphQLBoolean)},
+                rate: { type: GraphQLInt }
             },
             resolve(parent, args) {
                 return Movies.findByIdAndUpdate(
@@ -142,10 +130,12 @@ const Mutation = new GraphQLObjectType({
                         $set: {
                             name: args.name,
                             genre: args.genre,
-                            directorId: args.directorId
+                            directorId: args.directorId,
+                            watched: args.watched,
+                            rate: args.rate
                         }
                     },
-                    // єта опция позволяет в ответе увидеть обновленные данные
+                    // эта опция позволяет в ответе увидеть обновленные данные
                     { new: true }
                 )
             }
