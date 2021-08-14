@@ -14,21 +14,17 @@ import SaveIcon from '@material-ui/icons/Save';
 
 import withHocs from './MoviesFormHoc';
 
-// const directors = [
-//   { id: 1, name: 'Quentin Tarantino', age: 55, movies: [ { name: 'Movie 1' }, { name: 'Movie 2' } ] },
-//   { id: 2, name: 'Guy Ritchie', age: 50, movies: [ { name: 'Movie 1' }, { name: 'Movie 2' } ] }
-// ];
-
 class MoviesForm extends React.Component {
   handleClose = () => {
     this.props.onClose();
   };
 
   handleSave = () => {
-    const { selectedValue, onClose, addMovie } = this.props;
+    const { selectedValue, onClose, addMovie, updateMovie } = this.props;
     const { id, name, genre, rate, directorId, watched } = selectedValue;
     onClose();
-    addMovie({ id, name, genre, rate: Number(rate), directorId, watched: Boolean(watched)})
+    id ? updateMovie({ id, name, genre, rate: Number(rate), directorId, watched: Boolean(watched)})
+      : addMovie({ name, genre, rate: Number(rate), directorId, watched: Boolean(watched)})
   };
 
   render() {
